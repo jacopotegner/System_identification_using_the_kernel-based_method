@@ -1,5 +1,95 @@
-# System_identification_using_the_kernel-based_method
+# System Identification using Kernel-Based Regularization
 
-This project implements system identification techniques using kernel-based regularization methods in MATLAB. It focuses on estimating the impulse response of a nonparametric Output Error (OE) model by employing various kernel structures (TC, DI, and SS) and analyzing the impact of hyperparameters on estimation accuracy.  Project OverviewThe goal is to identify a system characterized by the model:$$y(t) = B(z)u(t-1) + e_0(t)$$where $B(z) = \sum_{k=0}^{n_B-1} b_k z^{-k}$ represents the impulse response and $e_0$ is White Gaussian Noise (WGN).  The estimation utilizes a Bayesian framework where the parameter vector $\theta$ is assumed to follow a Gaussian distribution $\mathcal{N}(0, K)$, with $K$ being a kernel-based covariance matrix.  Key FeaturesKernel Implementations: Support for Tuned/Correlated (TC), Diagonal (DI), and Stable Spline (SS) kernels.  Hyperparameter Analysis: Evaluation of system performance across different values of $\lambda$ (scaling) and $\beta$ (decay).  Regularized ARX Estimation: Integration of kernel matrices into the arx estimation process via arxOptions for improved robustness against noise.  Statistical Validation: Calculation and visualization of 95% confidence intervals for the estimated impulse responses.  Mathematical FrameworkKernel StructuresThe project explores three distinct ways to construct the kernel matrix $K \in \mathbb{R}^{n_B \times n_B}$:TC (Tuned/Correlated): $K(i,j) = \lambda \beta^{\max(i,j)}$.  DI (Diagonal): A diagonal matrix where $K(i,i) = \lambda \beta^i$.  SS (Stable Spline): A more complex correlation structure based on $c_i = \beta^i$, modeling smoother impulse responses.  Estimation & ConfidenceThe kernel-based estimate $\hat{\theta}_K$ is computed using the dataset $(y^N, u^N)$. To provide a "certificate of performance," the posterior covariance $P$ is calculated as:
-  $$\hat{P} = K - K\Phi^T(\Phi K\Phi^T + \hat{\sigma}_K^2 I)^{-1}\Phi K$$The 95% confidence interval is then derived using $1.96\sqrt{(\hat{P})_{k+1,k+1}}$.  Repository StructureLab304.m: The main MATLAB script that executes the data loading, matrix construction (including the Toeplitz $\Phi$ matrix), loop-based kernel testing, and visualization.  data.mat: (Not included) Contains the input signal $u$, output signal $y$, and the true impulse response $\theta_0$.  How to UseRequirements: MATLAB with the System Identification Toolbox.Setup: Ensure data.mat is in your working directory.Execution: Run Lab304.m.Output: The script generates three figures (one for each kernel type), each containing four subplots comparing the true impulse response $\theta_0$ against the estimated $\hat{\theta}$ under varying $\lambda$ and $\beta$ configurations.  ConclusionsThe implementation demonstrates how:High $\lambda$ values can lead to overfitting if not balanced by noise variance.  The decay rate $\beta$ is critical for capturing the physical reality of a fading impulse response.  Stable Spline kernels often provide smoother estimations suitable for specific physical systems compared to purely diagonal kernels.  
+This repository contains a MATLAB implementation of system identification techniques using kernel-based methods. The project focuses on estimating the impulse response of a nonparametric Output Error (OE) model by employing various kernel structures and analyzing the impact of hyperparameters on estimation accuracy.
 
+---
+
+## **Project Overview**
+
+The objective is to identify a system characterized by a nonparametric OE model:
+
+
+$$y(t) = F_{\theta_0}(z)u(t-1) + e_0(t)$$
+
+where $e_0$ is White Gaussian Noise (WGN) with a standard deviation $\sigma_0 = 0.58$. The system is approximated using an ARX model structure with a length of $n_B = 40$.
+
+The estimation utilizes a Bayesian framework where the parameter vector $\theta$ is assumed to follow a Gaussian distribution $\mathcal{N}(0, K)$, where $K$ is a kernel-based covariance matrix.
+
+### **Key Features**
+
+* **Kernel Implementations**: Supports **Tuned/Correlated (TC)**, **Diagonal (DI)**, and **Stable Spline (SS)** kernel structures.
+
+
+* **Hyperparameter Analysis**: Evaluates performance across different values of $\lambda$ (scaling factor) and $\beta$ (decay rate).
+
+
+* **Regularized Estimation**: Implements the `arx` estimation method with regularization matrices derived from the inverse of the kernels.
+
+
+* **Confidence Intervals**: Calculates and plots 95% confidence intervals to provide a "certificate" of estimation performance.
+
+
+
+---
+
+## **Mathematical Framework**
+
+### **Kernel Structures**
+
+Three distinct kernel matrices $K \in \mathbb{R}^{n_B \times n_B}$ are implemented:
+
+* 
+**TC (Tuned/Correlated)**: $K(i,j) = \lambda \beta^{\max(i,j)}$.
+
+
+* 
+**DI (Diagonal)**: A diagonal matrix where $K(i,i) = \lambda \beta^i$.
+
+
+* 
+**SS (Stable Spline)**: A correlation structure designed to model smooth, fading impulse responses.
+
+
+
+### **Estimation & Confidence Intervals**
+
+The kernel-based estimate $\hat{\theta}_K$ is computed using the dataset $(y^N, u^N)$. To validate the model, the posterior covariance matrix $\hat{P}$ is calculated as:
+
+
+$$\hat{P} = K - K\Phi^T(\Phi K\Phi^T + \hat{\sigma}_K^2 I)^{-1}\Phi K$$
+
+The 95% confidence interval for each impulse response coefficient is defined by $1.96\sqrt{(\hat{P})_{k+1,k+1}}$.
+
+---
+
+## **Repository Content**
+
+* `Lab304.m`: The primary MATLAB script. It handles data loading, Toeplitz matrix construction ($\Phi$), kernel generation, and the iterative testing of hyperparameters.
+
+
+* `data.mat`: Contains the input signal $u$, output signal $y$, and the true impulse response coefficients $\theta_0$.
+
+
+
+---
+
+## **Usage**
+
+1. Ensure the **System Identification Toolbox** is installed in MATLAB.
+2. Place `data.mat` in the same directory as the script.
+3. Run `Lab304.m`.
+
+
+---
+
+## **Conclusions**
+
+The implementation highlights several critical aspects of regularized system identification:
+
+* **Hyperparameter Sensitivity**: Large $\lambda$ values significantly increase the variance of the estimate if the noise level is high.
+
+
+* **Kernel Selection**: Different kernel types (TC, DI, SS) impose different prior beliefs on the system's smoothness and decay, affecting the bias-variance tradeoff.
+
+
+* **Reliability**: The inclusion of confidence intervals allows for a visual assessment of where the model is most certain about the system dynamics.
